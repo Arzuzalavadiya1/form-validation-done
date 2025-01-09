@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <div class="content">
+        <h2>Form Validation Example</h2><br>
+        <form id="myForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+            <div id="nameError" class="error"></div><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+            <div id="emailError" class="error"></div><br>
+
+            <label for="password">Password:</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password">
+                <i class="fa fa-eye toggle-password" id="togglePassword"></i>
+            </div>
+            <div id="passwordError" class="error"></div><br>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="errorMessages" class="error"></div>
+        <div id="resultContainer"></div>
+        <div id="dataList">
+            <h3>Submitted Data</h3>
+            <ul id="dataListUL"></ul>
+        </div>
+    </div>
+
+    <script>
+        
+        let formDataArray = [];
+
+        // Add data to the list
+        document.getElementById("myForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            const nameError = document.getElementById("nameError");
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
+            const errorMessages = document.getElementById("errorMessages");
+
+            nameError.innerHTML = "";
+            emailError.innerHTML = "";
+            passwordError.innerHTML = "";
+            errorMessages.innerHTML = "";
+        
+
+// name
+
+            if (name === "") {
+                nameError.innerHTML = "Name is required.";
+            } else if (name.length < 3) {
+                nameError.innerHTML = "Name must be at least 3 characters.";
+            }
+// email
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email === "") {
+                emailError.innerHTML = "Email is required.";
+            } else if (!emailRegex.test(email)) {
+                emailError.innerHTML = "Enter a valid email address.";
+            }
+
+          
+            
+// password
+
+            if (password === "") {
+                passwordError.innerHTML = "Password is required.";
+            } else {
+                if (password.length < 6) {
+                    passwordError.innerHTML = "Password must be at least 6 characters long.";
+                }
+                if (!/[A-Z]/.test(password)) {
+                    passwordError.innerHTML = "Password must include at least one uppercase letter.";
+                }
+                if (!/[a-z]/.test(password)) {
+                    passwordError.innerHTML = "Password must include at least one lowercase letter.";
+                }
+                if (!/\d/.test(password)) {
+                    passwordError.innerHTML = "Password must include at least one digit.";
+                }
+                if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    passwordError.innerHTML = "Password must include at least one special character.";
+                }
+            }
+
+            if (!nameError.innerHTML && !emailError.innerHTML && !passwordError.innerHTML) {
+                const formData = { name, email, password };
+                formDataArray.push(formData);
+                displayDataList();
+                document.getElementById("myForm").reset();
+            }
+        });
+
+
+
+        // Display submitted data in the list
+        function displayDataList() {
+            const dataListUL = document.getElementById("dataListUL");
+            dataListUL.innerHTML = "";
+
+            formDataArray.forEach((data, index) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <strong>Name:</strong> ${data.name} <br>
+                    <strong>Email:</strong> ${data.email} <br>
+                    <strong>Password:</strong> ${data.password} <br>
+                    <button onclick="updateData(${index})">update</button>
+                    <button onclick="deleteData(${index})">Delete</button>
+                `;
+                dataListUL.appendChild(li);
+            });
+        }
+
+        
+
+        // Update data in the list
+
+        function updateData(index) {
+            const data = formDataArray[index];
+            document.getElementById("name").value = data.name;
+            document.getElementById("email").value = data.email;
+            document.getElementById("password").value = data.password;
+
+            // Remove data from the array
+            formDataArray.splice(index, 1);
+            displayDataList();
+        }
+
+
+
+
+        // Delete data from the list
+        function deleteData(index) {
+            formDataArray.splice(index, 1);
+            displayDataList();
+        }
+
+        // Toggle password visibility
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordField = document.getElementById("password");
+            const icon = document.getElementById("togglePassword");
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                passwordField.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
